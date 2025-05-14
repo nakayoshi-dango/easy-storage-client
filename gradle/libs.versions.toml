@@ -1,0 +1,43 @@
+[versions]
+agp = "8.9.1"
+kotlin = "2.0.21"
+coreKtx = "1.10.1"
+junit = "4.13.2"
+junitVersion = "1.1.5"
+espressoCore = "3.5.1"
+appcompat = "1.6.1"
+material = "1.10.0"
+constraintlayout = "2.1.4"
+navigationFragmentKtx = "2.6.0"
+navigationUiKtx = "2.6.0"
+playServicesMlkitBarcodeScanning = "18.3.1"
+ksp = "2.0.21-1.0.27"
+
+[libraries]
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
+androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+play-services-code-scanner = "com.google.android.gms:play-services-code-scanner:16.1.0"
+camera-camera = 'androidx.camera:camera-camera2:1.4.2'
+camera-lifecycle = 'androidx.camera:camera-lifecycle:1.4.2'
+camera-view = 'androidx.camera:camera-view:1.4.2'
+play-services-mlkit-barcode-scanning = { group = "com.google.android.gms", name = "play-services-mlkit-barcode-scanning", version.ref = "playServicesMlkitBarcodeScanning" }
+retrofit = "com.squareup.retrofit2:retrofit:2.9.0"
+converter-gson = "com.squareup.retrofit2:converter-gson:2.9.0"
+converter-scalars = "com.squareup.retrofit2:converter-scalars:2.9.0"
+glide='com.github.bumptech.glide:glide:4.15.0'
+glide-compiler='com.github.bumptech.glide:ksp:4.15.0'
+glide-annotations="com.github.bumptech.glide:annotations:4.15.0"
+okhttp3='com.squareup.okhttp3:okhttp:4.12.0'
+okhttp3-login='com.squareup.okhttp3:logging-interceptor:4.12.0'
+swiperefresh="androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-beta01"
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+ksp={ id = "com.google.devtools.ksp", version.ref = "ksp" }
