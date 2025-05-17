@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
 
                     R.id.nav_usuario -> {
                         toolbar.title = getString(R.string.usuarios)
-                        loadFragment(UsuarioFragment())
+                        loadFragment(UsuarioFragment(0))
                         true
                     }
 

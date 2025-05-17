@@ -1,5 +1,6 @@
 package com.example.easy_storage
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,19 +9,22 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
+import com.example.easy_storage.api.RetrofitInstance
+import com.example.easy_storage.api.auth.TokenManager
+import com.example.easy_storage.api.products.ProductsRepository
+import com.example.easy_storage.api.users.UsersRepository
 import com.example.easy_storage.databinding.FragmentUsuarioBinding
+import com.example.easy_storage.models.UserDTO
+import java.text.SimpleDateFormat
+import java.util.*
 
-class UsuarioFragment : Fragment() {
+class UsuarioFragment(productsCount: Int) : Fragment() {
 
     private var _binding: FragmentUsuarioBinding? = null
     private val binding get() = _binding!!
-
-    // Aquí puedes cargar los datos reales del usuario
-    private val urlImagen = "https://cdn.discordapp.com/attachments/1371880792808099921/1372205572161671269/munequito.png?ex=6825ed86&is=68249c06&hm=4cc739945363720af26b485be617cf6549f0d6760f0b7a946574ee7732335d0d&";
-    private val nombreUsuario = "Juan Pérez"
-    private val rolUsuario = "Administrador"
-    private val productosGuardados = 17
-    private val fechaCreacion = "2024-01-15"
+    private val productsRepository = ProductsRepository(RetrofitInstance.productsApi)
+    private val usersRepository = UsersRepository(RetrofitInstance.usersApi)
+    private var productsCount: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,49 +34,88 @@ class UsuarioFragment : Fragment() {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) = with(binding) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Mostrar datos del usuario
-        binding.txtNombre.text = nombreUsuario
-        binding.txtRol.text = "Rol: $rolUsuario"
-        binding.txtProductos.text = "Productos guardados: $productosGuardados"
-        binding.txtFecha.text = "Fecha de creación: $fechaCreacion"
+        usersRepository.getCurrentUser { user ->
+            if (user != null) {
+                productsRepository.getMyProductsCount() { count ->
+                    mostrarDatosUsuario(user, count ?: 0)
+                }
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "No se pudieron cargar los datos del usuario",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
 
-        // Imagen de perfil opcional (por ejemplo con Glide)
-        if (isValidUrl(urlImagen)) {
-            Glide.with(this).load(urlImagen).into(binding.imgPerfil)
+        btnAyuda.setOnClickListener {
+            Toast.makeText(
+                requireContext(),
+                "Función de ayuda aún no disponible",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+
+        btnCerrarSesion.setOnClickListener {
+            TokenManager.clearToken()
+            reiniciarApp()
+        }
+    }
+
+    private fun mostrarDatosUsuario(user: UserDTO, count: Int) = with(binding) {
+        txtNombre.text = user.username
+        if (user.role.toString() == "ROLE_ADMIN") {
+            txtRol.text = "Rol: Administrador"
+        } else if (user.role.toString() == "ROLE_USER") {
+            txtRol.text = "Rol: Usuario"
+        }
+        txtProductos.text = "Productos guardados: $count"
+        txtFecha.text = "Fecha de creación: ${formatearFecha(user.creationDate)}"
+
+        if (isValidUrl(user.imageURL)) {
+            Glide.with(this@UsuarioFragment).load(user.imageURL).into(imgPerfil)
         } else {
-            binding.imgPerfil.setImageResource(R.drawable.munequito)
+            imgPerfil.setImageResource(R.drawable.munequito)
         }
+    }
 
-        // Botón ayuda
-        binding.btnAyuda.setOnClickListener {
-            Toast.makeText(requireContext(), "Función de ayuda aún no disponible", Toast.LENGTH_SHORT).show()
+    private fun formatearFecha(date: Date): String {
+        val formato = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return formato.format(date)
+    }
+
+    private fun isValidUrl(url: String?): Boolean {
+        if (url.isNullOrBlank()) return false
+        return try {
+            val uri = Uri.parse(url)
+            uri.scheme == "http" || uri.scheme == "https"
+        } catch (e: Exception) {
+            false
         }
+    }
 
-        // Botón cerrar sesión
-        binding.btnCerrarSesion.setOnClickListener {
-            Toast.makeText(requireContext(), "Sesión cerrada", Toast.LENGTH_SHORT).show()
-            // Aquí puedes llamar a tu lógica de logout, por ejemplo:
-            // AuthRepository.logout()
-            // startActivity(Intent(requireContext(), LoginActivity::class.java))
-            // requireActivity().finish()
+
+    private fun reiniciarApp() {
+        val intent =
+            requireContext().packageManager.getLaunchIntentForPackage(requireContext().packageName)
+        if (intent != null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            requireActivity().finish()
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "No se pudo reiniciar la aplicación",
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
-    }
-
-    fun isValidUrl(url: String?): Boolean {
-        if (url.isNullOrBlank()) return false
-        return try {
-            val uri = Uri.parse(url)
-            (uri.scheme == "http" || uri.scheme == "https")
-        } catch (e: Exception) {
-            false
-        }
+        super.onDestroyView()
     }
 }

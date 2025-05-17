@@ -2,6 +2,7 @@ package com.example.easy_storage.api
 
 import com.example.easy_storage.api.auth.AuthApi
 import com.example.easy_storage.api.products.ProductsApi
+import com.example.easy_storage.api.users.UsersApi
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -35,5 +36,8 @@ object RetrofitInstance {
 
     val productsApi: ProductsApi
         get() = retrofit!!.create(ProductsApi::class.java)
+
+    val usersApi: UsersApi
+        get() = retrofit!!.create(UsersApi::class.java)
 }
 

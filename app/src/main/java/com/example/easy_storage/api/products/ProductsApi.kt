@@ -13,6 +13,9 @@ interface ProductsApi {
     @GET("/products/mine")
     fun getMyProducts(): Call<List<ProductDTO>>
 
+    @GET("/products/mineCount")
+    fun getMyProductsCount(): Call<Int>
+
     @GET("/products/getProduct")
     fun getProduct(@Query("productId") productId: String): Call<ProductDTO>
 

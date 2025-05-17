@@ -37,6 +37,20 @@ class ProductsRepository(private val productsApi: ProductsApi) {
         })
     }
 
+    fun getMyProductsCount(onResult: (Int?) -> Unit) {
+        productsApi.getMyProductsCount().enqueue(object : Callback<Int> {
+            override fun onResponse(call: Call<Int>, response: Response<Int>) {
+                Log.e("ProductsRepo", "Respuesta: ${response}")
+                onResult(response.body())
+            }
+
+            override fun onFailure(call: Call<Int>, t: Throwable) {
+                Log.e("ProductsRepo", "Error al obtener el número de productos: ${t.message}")
+                onResult(null)
+            }
+        })
+    }
+
     fun getProduct(productId: String, onResult: (ProductDTO?) -> Unit) {
         productsApi.getProduct(productId).enqueue(object : Callback<ProductDTO> {
             override fun onResponse(call: Call<ProductDTO>, response: Response<ProductDTO>) {

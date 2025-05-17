@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Nombre del Usuario"
+        android:text=""
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -51,7 +51,7 @@
                 android:id="@+id/txtRol"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Rol: Usuario"
+                android:text="Rol: "
                 android:textSize="16sp" />
 
             <TextView
@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Productos guardados: 12"
+                android:text="Productos guardados: "
                 android:textSize="16sp" />
 
             <TextView
@@ -67,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Fecha de creación: 01/01/2024"
+                android:text="Fecha de creación: "
                 android:textSize="16sp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
