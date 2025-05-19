@@ -17,8 +17,10 @@ import android.util.Log
 
 class ProductosAdapter(
     private var productDTOS: List<ProductDTO>,
-    private val onOptionSelected: (productDTO: ProductDTO, option: String) -> Unit = { _, _ -> }
+    private val onOptionSelected: (productDTO: ProductDTO, option: String) -> Unit = { _, _ -> },
+    private val onItemClick: (productDTO: ProductDTO) -> Unit = {}
 ) : RecyclerView.Adapter<ProductosAdapter.ProductoViewHolder>() {
+
 
     inner class ProductoViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgProducto: ImageView = view.findViewById(R.id.imgProducto)
@@ -43,6 +45,10 @@ class ProductosAdapter(
             Glide.with(holder.itemView.context).load(producto.imageURL).into(holder.imgProducto)
         } else {
             holder.imgProducto.setImageResource(R.drawable.ic_launcher_foreground)
+        }
+
+        holder.itemView.setOnClickListener {
+            onItemClick(producto)
         }
 
         holder.menuButton.setOnClickListener { view ->

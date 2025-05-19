@@ -6,11 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.bumptech.glide.Glide
 import com.example.easy_storage.api.RetrofitInstance
 import com.example.easy_storage.api.products.ProductsRepository
 import com.example.easy_storage.models.ProductDTO
@@ -46,7 +49,10 @@ class ProductosFragment : Fragment() {
 
         fabAgregar.setOnClickListener {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, ScannerFragment()) // Usa el ID correcto de tu contenedor
+                .replace(
+                    R.id.fragmentContainer,
+                    ScannerFragment()
+                ) // Usa el ID correcto de tu contenedor
                 .addToBackStack(null)
                 .commit()
 
@@ -76,12 +82,18 @@ class ProductosFragment : Fragment() {
                 swipeRefreshLayout.isRefreshing = false
 
                 if (productos != null) {
-                    adapter = ProductosAdapter(productos) { producto, opcion ->
-                        when (opcion) {
-                            "editar" -> mostrarDialogoEditar(producto)
-                            "eliminar" -> eliminarProducto(producto)
+                    adapter = ProductosAdapter(
+                        productos,
+                        onOptionSelected = { producto, opcion ->
+                            when (opcion) {
+                                "editar" -> mostrarDialogoEditar(producto)
+                                "eliminar" -> eliminarProducto(producto)
+                            }
+                        },
+                        onItemClick = { producto ->
+                            mostrarDialogoDetalles(producto)
                         }
-                    }
+                    )
                     recyclerView.adapter = adapter
                 } else {
                     Toast.makeText(
@@ -93,6 +105,33 @@ class ProductosFragment : Fragment() {
             }
         }
     }
+
+    private fun mostrarDialogoDetalles(producto: ProductDTO) {
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_detalles_producto, null)
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Detalles del producto")
+            .setView(dialogView)
+            .setPositiveButton("Cerrar", null)
+            .create()
+
+        dialogView.findViewById<TextView>(R.id.tvId).text = "ID: ${producto.id}"
+        dialogView.findViewById<TextView>(R.id.tvNombre).text = "Nombre: ${producto.name}"
+        dialogView.findViewById<TextView>(R.id.tvDescripcion).text =
+            "Descripción: ${producto.description}"
+        dialogView.findViewById<TextView>(R.id.tvDondeComprar).text =
+            "Dónde comprar: ${producto.whereToBuy}"
+
+        val imageView = dialogView.findViewById<ImageView>(R.id.imageView)
+        if (!producto.imageURL.isNullOrBlank()) {
+            Glide.with(requireContext()).load(producto.imageURL).into(imageView)
+        } else {
+            imageView.setImageResource(R.drawable.ic_launcher_foreground)
+        }
+
+        dialog.show()
+    }
+
 
     private fun mostrarDialogoEditar(producto: ProductDTO) {
         val dialogView =
@@ -114,28 +153,36 @@ class ProductosFragment : Fragment() {
         inputURLImagen.setText(producto.imageURL)
 
         dialogView.findViewById<Button>(R.id.btnGuardar).setOnClickListener {
-            val jsonEditado = JsonObject().apply {
-                addProperty("id", producto.id)
-                addProperty("name", inputNombre.text.toString())
-                addProperty("description", inputDescripcion.text.toString())
-                addProperty("whereToBuy", inputDondeComprar.text.toString())
-                if (inputURLImagen.text.toString().isNotEmpty()) {
-                    addProperty("imageURL", inputURLImagen.text.toString())
-                }
-            }
-
-            productsRepository.updateProduct(jsonEditado) { success ->
-                requireActivity().runOnUiThread {
-                    if (success) {
-                        Toast.makeText(requireContext(), "Producto editado", Toast.LENGTH_SHORT)
-                            .show()
-                        loadProductos()
-                        dialog.dismiss()
-                    } else {
-                        Toast.makeText(requireContext(), "Error al editar", Toast.LENGTH_SHORT)
-                            .show()
+            if (inputNombre.text.toString().length < 255 && inputDondeComprar.text.toString().length < 255) {
+                val jsonEditado = JsonObject().apply {
+                    addProperty("id", producto.id)
+                    addProperty("name", inputNombre.text.toString())
+                    addProperty("description", inputDescripcion.text.toString())
+                    addProperty("whereToBuy", inputDondeComprar.text.toString())
+                    if (inputURLImagen.text.toString().isNotEmpty()) {
+                        addProperty("imageURL", inputURLImagen.text.toString())
                     }
                 }
+
+                productsRepository.updateProduct(jsonEditado) { success ->
+                    requireActivity().runOnUiThread {
+                        if (success) {
+                            Toast.makeText(requireContext(), "Producto editado", Toast.LENGTH_SHORT)
+                                .show()
+                            loadProductos()
+                            dialog.dismiss()
+                        } else {
+                            Toast.makeText(requireContext(), "Error al editar", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Error. Dónde comprar o nombre demasiado largo.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
@@ -143,7 +190,8 @@ class ProductosFragment : Fragment() {
     }
 
     private fun mostrarDialogoCrear(productId: String?) {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_crear_producto, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_crear_producto, null)
         val dialog = android.app.AlertDialog.Builder(requireContext())
             .setTitle("Nuevo producto")
             .setView(dialogView)
@@ -155,32 +203,44 @@ class ProductosFragment : Fragment() {
         val inputURLImagen = dialogView.findViewById<EditText>(R.id.inputURLImagen)
 
         dialogView.findViewById<Button>(R.id.btnGuardar).setOnClickListener {
-            val nuevoProducto = JsonObject().apply {
-                addProperty("id", productId)
-                addProperty("name", inputNombre.text.toString())
-                addProperty("description", inputDescripcion.text.toString())
-                addProperty("whereToBuy", inputDondeComprar.text.toString())
-                if (inputURLImagen.text.toString().isNotEmpty()) {
-                    addProperty("imageURL", inputURLImagen.text.toString())
-                }
-            }
-
-            productsRepository.createProduct(nuevoProducto) { success ->
-                requireActivity().runOnUiThread {
-                    if (success) {
-                        Toast.makeText(requireContext(), "Producto creado", Toast.LENGTH_SHORT).show()
-                        loadProductos()
-                        dialog.dismiss()
-                    } else {
-                        Toast.makeText(requireContext(), "Error. Ya existe un producto con esta ID o nombre.", Toast.LENGTH_SHORT).show()
+            if (inputNombre.text.toString().length < 255 && inputDondeComprar.text.toString().length < 255) {
+                val nuevoProducto = JsonObject().apply {
+                    addProperty("id", productId)
+                    addProperty("name", inputNombre.text.toString())
+                    addProperty("description", inputDescripcion.text.toString())
+                    addProperty("whereToBuy", inputDondeComprar.text.toString())
+                    if (inputURLImagen.text.toString().isNotEmpty()) {
+                        addProperty("imageURL", inputURLImagen.text.toString())
                     }
                 }
+
+                productsRepository.createProduct(nuevoProducto) { success ->
+                    requireActivity().runOnUiThread {
+                        if (success) {
+                            Toast.makeText(requireContext(), "Producto creado", Toast.LENGTH_SHORT)
+                                .show()
+                            loadProductos()
+                            dialog.dismiss()
+                        } else {
+                            Toast.makeText(
+                                requireContext(),
+                                "Error. Ya existe un producto con esta ID o nombre.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                }
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Error. Dónde comprar o nombre demasiado largo.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
         dialog.show()
     }
-
 
     private fun eliminarProducto(producto: ProductDTO) {
         android.app.AlertDialog.Builder(requireContext())
