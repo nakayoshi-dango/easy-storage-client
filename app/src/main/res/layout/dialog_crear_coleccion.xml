@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/inputNombreColeccion"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:hint="Nombre de la colección" />
+
+    <EditText
+        android:id="@+id/inputDescripcionColeccion"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:hint="Descripción" />
+
+    <Button
+        android:id="@+id/btnGuardarColeccion"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:text="@string/guardar"
+        android:textSize="24sp"
+        android:backgroundTint="@color/main" />
+</LinearLayout>

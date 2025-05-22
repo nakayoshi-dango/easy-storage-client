@@ -38,18 +38,29 @@ class UsuarioFragment(productsCount: Int) : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         usersRepository.getCurrentUser { user ->
+            if (!isFragmentReady()) return@getCurrentUser
+
             if (user != null) {
-                productsRepository.getMyProductsCount() { count ->
-                    mostrarDatosUsuario(user, count ?: 0)
+                productsRepository.getMyProductsCount { count ->
+                    if (!isFragmentReady()) return@getMyProductsCount
+
+                    requireActivity().runOnUiThread {
+                        if (!isFragmentReady()) return@runOnUiThread
+                        mostrarDatosUsuario(user, count ?: 0)
+                    }
                 }
             } else {
-                Toast.makeText(
-                    requireContext(),
-                    "No se pudieron cargar los datos del usuario",
-                    Toast.LENGTH_SHORT
-                ).show()
+                requireActivity().runOnUiThread {
+                    if (!isFragmentReady()) return@runOnUiThread
+                    Toast.makeText(
+                        requireContext(),
+                        "No se pudieron cargar los datos del usuario",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
+
 
         btnAyuda.setOnClickListener {
             Toast.makeText(
@@ -64,6 +75,11 @@ class UsuarioFragment(productsCount: Int) : Fragment() {
             reiniciarApp()
         }
     }
+
+    private fun isFragmentReady(): Boolean {
+        return isAdded && activity != null && view != null
+    }
+
 
     private fun mostrarDatosUsuario(user: UserDTO, count: Int) = with(binding) {
         txtNombre.text = user.username

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvUsuariosDisponibles"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" />
+
+    <ImageButton
+        android:id="@+id/btnConfirmarMiembros"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:backgroundTint="@color/main"
+        android:src="@drawable/ic_checkmark"
+        android:background="@drawable/round_button"
+        android:layout_gravity="end"
+        android:contentDescription="Confirmar selección"/>
+</LinearLayout>

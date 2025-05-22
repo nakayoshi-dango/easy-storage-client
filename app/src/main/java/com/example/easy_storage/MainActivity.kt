@@ -40,6 +40,12 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
 
+                    R.id.nav_colecciones -> {
+                        toolbar.title = getString(R.string.colecciones)
+                        loadFragment(ColeccionesFragment())
+                        true
+                    }
+
                     R.id.nav_usuario -> {
                         toolbar.title = getString(R.string.usuarios)
                         loadFragment(UsuarioFragment(0))

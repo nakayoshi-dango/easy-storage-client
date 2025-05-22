@@ -12,4 +12,6 @@
     <string name="recycler_productos">Lista de productos en el catálogo.</string>
     <string name="crear_producto">Crear Producto</string>
     <string name="guardar">Guardar</string>
+    <string name="crear_coleccion">Crear Colección</string>
+    <string name="recycler_colecciones">Lista de colecciones</string>
 </resources>

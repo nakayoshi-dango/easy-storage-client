@@ -1,6 +1,7 @@
 package com.example.easy_storage.api
 
 import com.example.easy_storage.api.auth.AuthApi
+import com.example.easy_storage.api.collections.CollectionsApi
 import com.example.easy_storage.api.products.ProductsApi
 import com.example.easy_storage.api.users.UsersApi
 import okhttp3.OkHttpClient
@@ -36,6 +37,9 @@ object RetrofitInstance {
 
     val productsApi: ProductsApi
         get() = retrofit!!.create(ProductsApi::class.java)
+
+    val collectionsApi: CollectionsApi
+        get() = retrofit!!.create(CollectionsApi::class.java)
 
     val usersApi: UsersApi
         get() = retrofit!!.create(UsersApi::class.java)

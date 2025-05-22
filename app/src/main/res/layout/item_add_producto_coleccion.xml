@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <ImageView
+        android:id="@+id/ivImagenProducto"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/munequito" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/txtNombreProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre" />
+
+        <TextView
+            android:id="@+id/txtIdProducto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID"
+            android:textColor="#888888"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnRestar"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/round_button"
+        android:contentDescription="Restar"
+        android:src="@drawable/ic_minus" />
+
+    <EditText
+        android:id="@+id/inputCantidad"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:inputType="numberSigned"
+        android:text="0" />
+
+    <ImageButton
+        android:id="@+id/btnSumar"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="@drawable/round_button"
+        android:contentDescription="Sumar"
+        android:src="@drawable/ic_plus" />
+</LinearLayout>

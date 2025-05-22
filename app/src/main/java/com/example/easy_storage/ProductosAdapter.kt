@@ -76,9 +76,4 @@ class ProductosAdapter(
     }
 
     override fun getItemCount(): Int = productDTOS.size
-
-    fun setList(nuevos: List<ProductDTO>) {
-        productDTOS = nuevos
-        notifyDataSetChanged()
-    }
 }
