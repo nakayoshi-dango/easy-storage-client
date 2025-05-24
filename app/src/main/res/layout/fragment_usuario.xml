@@ -59,7 +59,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Productos guardados: "
+                android:text="Productos creados: "
                 android:textSize="16sp" />
 
             <TextView

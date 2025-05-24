@@ -14,7 +14,8 @@ import com.example.easy_storage.models.UserDTO
 class MiembroColeccionAdapter(
     private var miembros: MutableList<UserDTO>,
     private val collectionName: String,
-    private val onEliminarClick: (String, String) -> Unit
+    private val onEliminarClick: (String, String) -> Unit,
+    private val puedeEliminar: Boolean
 ) : RecyclerView.Adapter<MiembroColeccionAdapter.MiembroViewHolder>() {
 
     inner class MiembroViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -31,6 +32,8 @@ class MiembroColeccionAdapter(
 
     override fun onBindViewHolder(holder: MiembroViewHolder, position: Int) {
         val miembro = miembros[position]
+
+        // Imagen
         if (isValidUrl(miembro.imageURL)) {
             Glide.with(holder.itemView.context)
                 .load(miembro.imageURL)
@@ -40,13 +43,18 @@ class MiembroColeccionAdapter(
         } else {
             holder.ivImagenUsuario.setImageResource(R.drawable.munequito)
         }
+
         holder.txtNombre.text = miembro.username
 
+        // Mostrar o no el botón eliminar
+        holder.btnEliminar.visibility = if (puedeEliminar) View.VISIBLE else View.GONE
+
+        // Acción eliminar
         holder.btnEliminar.setOnClickListener {
             val removedPosition = holder.adapterPosition
-            onEliminarClick(collectionName, miembro.username) // Lógica de backend
-            miembros.removeAt(removedPosition)          // Elimina del adapter
-            notifyItemRemoved(removedPosition)           // Notifica el cambio
+            onEliminarClick(collectionName, miembro.username)
+            miembros.removeAt(removedPosition)
+            notifyItemRemoved(removedPosition)
         }
     }
 
@@ -55,7 +63,6 @@ class MiembroColeccionAdapter(
         miembros.addAll(nuevaLista)
         notifyDataSetChanged()
     }
-
 
     override fun getItemCount(): Int = miembros.size
 

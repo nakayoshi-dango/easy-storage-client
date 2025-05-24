@@ -1,5 +1,6 @@
 package com.example.easy_storage
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.*
 import android.widget.*
@@ -13,6 +14,9 @@ import com.example.easy_storage.models.CollectionDTO
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.JsonObject
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
+import com.bumptech.glide.Glide
+import com.example.easy_storage.UsuarioFragment
 import com.example.easy_storage.api.products.ProductsRepository
 import com.example.easy_storage.api.users.UsersRepository
 import com.example.easy_storage.models.ProductCollectionDTO
@@ -57,90 +61,123 @@ class ColeccionesFragment : Fragment() {
 
     private fun loadColecciones() {
         swipeRefreshLayout.isRefreshing = true
+        usersRepository.getCurrentUser { user ->
+            val isAdmin = user?.role == "ROLE_ADMIN"
 
-        collectionsRepository.getVisibleCollections { colecciones ->
-            if (!isAdded || activity == null) return@getVisibleCollections
+            val cargarColecciones: ((List<CollectionDTO>?) -> Unit) -> Unit =
+                if (isAdmin) collectionsRepository::getAllCollections
+                else collectionsRepository::getVisibleCollections
 
-            requireActivity().runOnUiThread {
-                if (!isAdded || view == null) return@runOnUiThread
+            cargarColecciones { colecciones ->
+                if (!isAdded || activity == null) return@cargarColecciones
 
-                swipeRefreshLayout.isRefreshing = false
+                requireActivity().runOnUiThread {
+                    if (!isAdded || view == null) return@runOnUiThread
 
-                if (colecciones != null) {
-                    adapter = ColeccionesAdapter(
-                        colecciones,
-                        onOptionSelected = { coleccion, opcion ->
-                            when (opcion) {
-                                "editar" -> mostrarDialogoEditar(coleccion)
-                                "eliminar" -> eliminarColeccion(coleccion)
-                            }
-                        },
-                        onItemClick = { coleccion ->
-                            var miembros: List<UserDTO>? = null
-                            var productos: List<ProductCollectionDTO>? = null
+                    swipeRefreshLayout.isRefreshing = false
 
-                            fun intentarMostrarDialogo() {
-                                // Solo se ejecuta cuando ambos valores no son null
-                                if (miembros != null && productos != null) {
-                                    mostrarDialogoDetalles(
-                                        coleccion,
-                                        miembros!!,
-                                        productos!!,
-                                        onEliminarMiembro = { collectionName, usernameToDelete ->
-                                            usersRepository.deleteFromCollection(collectionName, usernameToDelete) { success ->
-                                                requireActivity().runOnUiThread {
-                                                    if (success) {
-                                                        Toast.makeText(requireContext(), "Miembro eliminado", Toast.LENGTH_SHORT).show()
-                                                        loadColecciones()
-                                                    } else {
-                                                        Toast.makeText(requireContext(), "Error al eliminar miembro", Toast.LENGTH_SHORT).show()
+                    if (colecciones != null) {
+                        adapter = ColeccionesAdapter(
+                            colecciones,
+                            onOptionSelected = { coleccion, opcion ->
+                                when (opcion) {
+                                    "editar" -> mostrarDialogoEditar(coleccion)
+                                    "eliminar" -> eliminarColeccion(coleccion)
+                                }
+                            },
+                            onItemClick = { coleccion ->
+                                var miembros: List<UserDTO>? = null
+                                var productos: List<ProductCollectionDTO>? = null
+                                var puedeModificarMiembros: Boolean? = null
+
+                                fun intentarMostrarDialogo() {
+                                    if (miembros != null && productos != null && puedeModificarMiembros != null) {
+                                        mostrarDialogoDetalles(
+                                            coleccion,
+                                            miembros!!,
+                                            productos!!,
+                                            puedeModificarMiembros!!,
+                                            onEliminarMiembro = { collectionName, usernameToDelete ->
+                                                usersRepository.deleteFromCollection(
+                                                    collectionName,
+                                                    usernameToDelete
+                                                ) { success ->
+                                                    requireActivity().runOnUiThread {
+                                                        if (success) {
+                                                            Toast.makeText(
+                                                                requireContext(),
+                                                                "Miembro eliminado",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                            loadColecciones()
+                                                        } else {
+                                                            Toast.makeText(
+                                                                requireContext(),
+                                                                "Error al eliminar miembro",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            onEliminarProducto = { productId, collectionName ->
+                                                productsRepository.deleteFromCollection(
+                                                    productId,
+                                                    collectionName
+                                                ) { success ->
+                                                    requireActivity().runOnUiThread {
+                                                        if (success) {
+                                                            Toast.makeText(
+                                                                requireContext(),
+                                                                "Producto eliminado",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                            loadColecciones()
+                                                        } else {
+                                                            Toast.makeText(
+                                                                requireContext(),
+                                                                "Error al eliminar producto",
+                                                                Toast.LENGTH_SHORT
+                                                            ).show()
+                                                        }
                                                     }
                                                 }
                                             }
-                                        },
-                                        onEliminarProducto = { productId, collectionName ->
-                                            productsRepository.deleteFromCollection(productId, collectionName) { success ->
-                                                requireActivity().runOnUiThread {
-                                                    if (success) {
-                                                        Toast.makeText(requireContext(), "Producto eliminado", Toast.LENGTH_SHORT).show()
-                                                        loadColecciones()
-                                                    } else {
-                                                        Toast.makeText(requireContext(), "Error al eliminar producto", Toast.LENGTH_SHORT).show()
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    )
+                                        )
+                                    }
+                                }
+
+                                collectionsRepository.getUsersInCollection(coleccion.name) { users ->
+                                    requireActivity().runOnUiThread {
+                                        miembros = users ?: emptyList()
+                                        intentarMostrarDialogo()
+                                    }
+                                }
+
+                                collectionsRepository.getProductsInCollection(coleccion.name) { products ->
+                                    requireActivity().runOnUiThread {
+                                        productos = products ?: emptyList()
+                                        intentarMostrarDialogo()
+                                    }
+                                }
+
+                                usersRepository.getCurrentUser { user ->
+                                    requireActivity().runOnUiThread {
+                                        puedeModificarMiembros =
+                                            user?.username == coleccion.ownerUsername || user?.role == "ROLE_ADMIN"
+                                        intentarMostrarDialogo()
+                                    }
                                 }
                             }
-
-                            // Obtener miembros
-                            collectionsRepository.getUsersInCollection(coleccion.name) { users ->
-                                requireActivity().runOnUiThread {
-                                    miembros = users ?: emptyList()
-                                    intentarMostrarDialogo()
-                                }
-                            }
-
-
-
-                            // Obtener productos
-                            collectionsRepository.getProductsInCollection(coleccion.name) { products ->
-                                requireActivity().runOnUiThread {
-                                    productos = products ?: emptyList()
-                                    intentarMostrarDialogo()
-                                }
-                            }
-
-                        }
-                    )
-                    recyclerView.adapter = adapter
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Error al cargar colecciones",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        )
+                        recyclerView.adapter = adapter
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Error al cargar colecciones",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
@@ -150,6 +187,7 @@ class ColeccionesFragment : Fragment() {
         coleccion: CollectionDTO,
         miembros: List<UserDTO>,
         productos: List<ProductCollectionDTO>,
+        puedeModificarMiembros: Boolean,
         onEliminarMiembro: (String, String) -> Unit,
         onEliminarProducto: (String, String) -> Unit
     ) {
@@ -160,42 +198,81 @@ class ColeccionesFragment : Fragment() {
         val tvId = dialogView.findViewById<TextView>(R.id.tvIdColeccion)
         val tvNombre = dialogView.findViewById<TextView>(R.id.tvNombreColeccion)
         val tvDescripcion = dialogView.findViewById<TextView>(R.id.tvDescripcionColeccion)
+        val ivImagenPropietario = dialogView.findViewById<ImageView>(R.id.ivImagenPropietario)
+        val tvNombrePropietarioColeccion =
+            dialogView.findViewById<TextView>(R.id.tvNombrePropietarioColeccion)
 
         tvId.text = "ID: ${coleccion.id}"
         tvNombre.text = "Nombre: ${coleccion.name}"
         tvDescripcion.text = "Descripción: ${coleccion.description}"
+        usersRepository.getCurrentUser { user ->
+            requireActivity().runOnUiThread {
+                if (isValidUrl(user?.imageURL)) {
+                    Glide.with(this@ColeccionesFragment).load(user?.imageURL)
+                        .into(ivImagenPropietario)
+                } else {
+                    ivImagenPropietario.setImageResource(R.drawable.munequito)
+                }
+            }
+        }
+        tvNombrePropietarioColeccion.text = coleccion.ownerUsername
+
 
         // Recycler de miembros
         val rvMiembros = dialogView.findViewById<RecyclerView>(R.id.rvMiembros)
         rvMiembros.layoutManager = LinearLayoutManager(requireContext())
-        val miembroAdapter = MiembroColeccionAdapter(miembros.toMutableList(), coleccion.name, onEliminarMiembro)
+        val miembroAdapter = MiembroColeccionAdapter(
+            miembros.toMutableList(),
+            coleccion.name,
+            onEliminarMiembro,
+            puedeModificarMiembros
+        )
         rvMiembros.adapter = miembroAdapter
 
         // Recycler de productos
         val rvProductos = dialogView.findViewById<RecyclerView>(R.id.rvProductos)
         rvProductos.layoutManager = LinearLayoutManager(requireContext())
-        val productoAdapter = ProductoColeccionAdapter(productos.toMutableList(), coleccion.name, onEliminarProducto)
+        val productoAdapter =
+            ProductoColeccionAdapter(productos.toMutableList(), coleccion.name, onEliminarProducto)
         rvProductos.adapter = productoAdapter
 
         // Botones flotantes
         val btnAddMiembro = dialogView.findViewById<ImageButton>(R.id.btnAddMiembro)
         val btnAddProducto = dialogView.findViewById<ImageButton>(R.id.btnAddProducto)
 
+        btnAddMiembro.isEnabled = puedeModificarMiembros
+        btnAddMiembro.isVisible = puedeModificarMiembros
         btnAddMiembro.setOnClickListener {
-            collectionsRepository.getNonUsersInCollection(coleccion.name) { noMiembros ->
-                requireActivity().runOnUiThread {
-                    mostrarDialogoAddMiembro(
-                        coleccion.name,
-                        usuariosDisponibles = noMiembros ?: emptyList(),
-                        onMiembrosActualizados = { nuevosMiembros ->
-                            // Actualizamos todos los miembros desde backend para estar seguros
-                            collectionsRepository.getUsersInCollection(coleccion.name) { actualizados ->
-                                requireActivity().runOnUiThread {
-                                    miembroAdapter.actualizarLista(actualizados ?: emptyList())
-                                }
+            usersRepository.getCurrentUser { user ->
+                if (user?.username == (coleccion.ownerUsername) || user?.role == "ROLE_ADMIN") {
+                    requireActivity().runOnUiThread {
+                        collectionsRepository.getNonUsersInCollection(coleccion.name) { noMiembros ->
+                            requireActivity().runOnUiThread {
+                                mostrarDialogoAddMiembro(
+                                    coleccion.name,
+                                    usuariosDisponibles = noMiembros ?: emptyList(),
+                                    onMiembrosActualizados = { nuevosMiembros ->
+                                        // Actualizamos todos los miembros desde backend para estar seguros
+                                        collectionsRepository.getUsersInCollection(coleccion.name) { actualizados ->
+                                            requireActivity().runOnUiThread {
+                                                miembroAdapter.actualizarLista(
+                                                    actualizados ?: emptyList()
+                                                )
+                                            }
+                                        }
+                                    }
+                                )
                             }
                         }
-                    )
+                    }
+                } else {
+                    requireActivity().runOnUiThread {
+                        Toast.makeText(
+                            requireContext(),
+                            "No tienes permiso para añadir miembros",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
@@ -216,6 +293,16 @@ class ColeccionesFragment : Fragment() {
             .setView(dialogView)
             .setCancelable(true)
             .show()
+    }
+
+    private fun isValidUrl(url: String?): Boolean {
+        if (url.isNullOrBlank()) return false
+        return try {
+            val uri = Uri.parse(url)
+            uri.scheme == "http" || uri.scheme == "https"
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun mostrarDialogoAddMiembro(
@@ -245,7 +332,11 @@ class ColeccionesFragment : Fragment() {
             val usuariosAñadidos = mutableListOf<UserDTO>()
             var pendientes = seleccionados.size
             if (pendientes == 0) {
-                Toast.makeText(requireContext(), "No has seleccionado ningún usuario", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    "No has seleccionado ningún usuario",
+                    Toast.LENGTH_SHORT
+                ).show()
                 return@setOnClickListener
             }
 
@@ -257,7 +348,11 @@ class ColeccionesFragment : Fragment() {
                         }
                         pendientes--
                         if (pendientes == 0) {
-                            Toast.makeText(requireContext(), "Miembros añadidos", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Miembros añadidos",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             onMiembrosActualizados(usuariosAñadidos)
                             dialog.dismiss()
                         }
@@ -280,8 +375,10 @@ class ColeccionesFragment : Fragment() {
                     val dialogView = LayoutInflater.from(requireContext())
                         .inflate(R.layout.dialog_add_producto_coleccion, null)
 
-                    val recyclerView = dialogView.findViewById<RecyclerView>(R.id.rvProductosDisponibles)
-                    val btnConfirmar = dialogView.findViewById<ImageButton>(R.id.btnConfirmarProductos)
+                    val recyclerView =
+                        dialogView.findViewById<RecyclerView>(R.id.rvProductosDisponibles)
+                    val btnConfirmar =
+                        dialogView.findViewById<ImageButton>(R.id.btnConfirmarProductos)
 
                     recyclerView.layoutManager = LinearLayoutManager(requireContext())
                     val adapter = AddProductoAdapter(productos)
@@ -295,7 +392,8 @@ class ColeccionesFragment : Fragment() {
                     btnConfirmar.setOnClickListener {
                         val cambios = adapter.obtenerCambios()
                         if (cambios.isEmpty()) {
-                            Toast.makeText(requireContext(), "No hay cambios", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "No hay cambios", Toast.LENGTH_SHORT)
+                                .show()
                             return@setOnClickListener
                         }
 
@@ -303,7 +401,11 @@ class ColeccionesFragment : Fragment() {
                         var algunoFalló = false
 
                         for ((productId, cantidad) in cambios) {
-                            productsRepository.addToCollection(productId, nombreColeccion, cantidad) { success ->
+                            productsRepository.addToCollection(
+                                productId,
+                                nombreColeccion,
+                                cantidad
+                            ) { success ->
                                 requireActivity().runOnUiThread {
                                     if (!success) algunoFalló = true
                                     pendientes--
@@ -311,13 +413,23 @@ class ColeccionesFragment : Fragment() {
                                     if (pendientes == 0) {
                                         dialog.dismiss()
                                         if (algunoFalló) {
-                                            Toast.makeText(requireContext(), "Hubo errores al añadir productos", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Hubo errores al añadir productos",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         } else {
-                                            Toast.makeText(requireContext(), "Productos añadidos", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(
+                                                requireContext(),
+                                                "Productos añadidos",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
                                         }
 
                                         // Refrescamos los productos
-                                        collectionsRepository.getProductsInCollection(nombreColeccion) { nuevosProductos ->
+                                        collectionsRepository.getProductsInCollection(
+                                            nombreColeccion
+                                        ) { nuevosProductos ->
                                             requireActivity().runOnUiThread {
                                                 if (nuevosProductos != null) {
                                                     onProductosActualizados(nuevosProductos)
@@ -332,7 +444,11 @@ class ColeccionesFragment : Fragment() {
 
                     dialog.show()
                 } else {
-                    Toast.makeText(requireContext(), "Error al cargar productos", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "Error al cargar productos",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         }

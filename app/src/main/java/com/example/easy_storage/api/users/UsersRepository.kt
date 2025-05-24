@@ -26,6 +26,7 @@ class UsersRepository(private val usersApi: UsersApi) {
         usersApi.getMyInfo().enqueue(object : Callback<UserDTO> {
             override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
                 if (response.isSuccessful) {
+                    Log.e("UsersRepo","getCurrentUser: $response")
                     callback(response.body())
                 } else {
                     callback(null)
@@ -33,6 +34,7 @@ class UsersRepository(private val usersApi: UsersApi) {
             }
 
             override fun onFailure(call: Call<UserDTO>, t: Throwable) {
+                Log.e("UsersRepo","getCurrentUser: $t")
                 callback(null)
             }
         })

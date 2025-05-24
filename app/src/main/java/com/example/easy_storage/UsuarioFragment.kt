@@ -88,7 +88,7 @@ class UsuarioFragment(productsCount: Int) : Fragment() {
         } else if (user.role.toString() == "ROLE_USER") {
             txtRol.text = "Rol: Usuario"
         }
-        txtProductos.text = "Productos guardados: $count"
+        txtProductos.text = "Productos creados: $count"
         txtFecha.text = "Fecha de creación: ${formatearFecha(user.creationDate)}"
 
         if (isValidUrl(user.imageURL)) {

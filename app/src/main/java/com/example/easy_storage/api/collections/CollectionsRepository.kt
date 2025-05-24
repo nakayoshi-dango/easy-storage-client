@@ -170,4 +170,23 @@ class CollectionsRepository(private val api: CollectionsApi) {
             }
         })
     }
+
+    fun getAllCollections(callback: (List<CollectionDTO>?) -> Unit) {
+        api.getAllCollections().enqueue(object : Callback<List<CollectionDTO>> {
+            override fun onResponse(call: Call<List<CollectionDTO>>, response: Response<List<CollectionDTO>>) {
+                if (response.isSuccessful) {
+                    callback(response.body())
+                } else {
+                    Log.e("API", "Error getAllCollections: ${response.code()}")
+                    callback(null)
+                }
+            }
+
+            override fun onFailure(call: Call<List<CollectionDTO>>, t: Throwable) {
+                Log.e("API", "Error getAllCollections: ${t.message}")
+                callback(null)
+            }
+        })
+    }
+
 }

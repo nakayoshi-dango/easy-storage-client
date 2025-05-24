@@ -9,6 +9,9 @@ import retrofit2.http.*
 
 interface CollectionsApi {
 
+    @GET("/admin/getAllCollections")
+    fun getAllCollections(): Call<List<CollectionDTO>>
+
     @GET("/collections/mine")
     fun getMyCollections(): Call<List<CollectionDTO>>
 

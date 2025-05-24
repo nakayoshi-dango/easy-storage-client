@@ -5,9 +5,9 @@
 
     <LinearLayout
         android:id="@+id/layoutCabecera"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tvIdColeccion"
@@ -26,50 +26,76 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Descripción:" />
+
+        <LinearLayout
+            android:id="@+id/layoutPropietario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvPropietarioTagColeccion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Propietario:" />
+
+            <ImageView
+                android:id="@+id/ivImagenPropietario"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:contentDescription="Imagen Propietario" />
+
+            <TextView
+                android:id="@+id/tvNombrePropietarioColeccion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nombre" />
+
+        </LinearLayout>
     </LinearLayout>
 
     <TextView
         android:id="@+id/tvMiembros"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/layoutCabecera"
         android:layout_marginTop="12dp"
-        android:text="Miembros:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:text="Miembros:" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMiembros"
-        android:layout_below="@id/tvMiembros"
-        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvMiembros"
+        android:layout_marginTop="4dp" />
 
     <TextView
         android:id="@+id/tvProductos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/rvMiembros"
         android:layout_marginTop="12dp"
-        android:text="Productos:"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:text="Productos:" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvProductos"
-        android:layout_below="@id/tvProductos"
-        android:layout_marginTop="4dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvProductos"
+        android:layout_marginTop="4dp" />
 
     <ImageButton
         android:id="@+id/btnAddProducto"
         android:layout_width="56dp"
         android:layout_height="56dp"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/round_button"
-        android:src="@drawable/ic_add_product"
         android:backgroundTint="@color/main"
-        android:contentDescription="Añadir producto" />
+        android:contentDescription="Añadir producto"
+        android:src="@drawable/ic_add_product" />
 
     <ImageButton
         android:id="@+id/btnAddMiembro"
@@ -79,8 +105,8 @@
         android:layout_alignEnd="@id/btnAddProducto"
         android:layout_marginBottom="12dp"
         android:background="@drawable/round_button"
-        android:src="@drawable/ic_add"
         android:backgroundTint="@color/main"
-        android:contentDescription="Añadir miembro" />
+        android:contentDescription="Añadir miembro"
+        android:src="@drawable/ic_add" />
 
 </RelativeLayout>
