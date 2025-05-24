@@ -17,12 +17,12 @@ class CollectionsRepository(private val api: CollectionsApi) {
                 call: Call<List<CollectionDTO>>,
                 response: Response<List<CollectionDTO>>
             ) {
-                Log.d("CollectionsRepo", "getMyCollections -> ${response}")
+                Log.d("CollectionsRepo", "getMyCollections: ${response}")
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<List<CollectionDTO>>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "getMyCollections: ${t.message}")
                 onResult(null)
             }
         })
@@ -34,7 +34,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
                 call: Call<List<CollectionDTO>>,
                 response: Response<List<CollectionDTO>>
             ) {
-                Log.d("CollectionsRepo", "getVisibleCollections -> ${response}")
+                Log.d("CollectionsRepo", "getVisibleCollections: ${response}")
                 if (!response.isSuccessful) {
                     val empty: List<CollectionDTO> = emptyList()
                     onResult(empty)
@@ -44,7 +44,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
             }
 
             override fun onFailure(call: Call<List<CollectionDTO>>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "getVisibleCollections: ${t.message}")
                 onResult(null)
             }
         })
@@ -56,7 +56,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
                 call: Call<List<ProductCollectionDTO>>,
                 response: Response<List<ProductCollectionDTO>>
             ) {
-                Log.d("CollectionsRepo", "getProductsInCollection -> ${response}")
+                Log.d("CollectionsRepo", "getProductsInCollection: ${response}")
                 if (response.isSuccessful) {
                     if (response.body()
                             ?.equals("No existen productos en esta colección.") == true
@@ -70,7 +70,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
             }
 
             override fun onFailure(call: Call<List<ProductCollectionDTO>>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "getProductsInCollection: ${t.message}")
                 onResult(null)
             }
         })
@@ -79,7 +79,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
     fun getUsersInCollection(name: String, onResult: (List<UserDTO>?) -> Unit) {
         api.getUsersInCollection(name).enqueue(object : Callback<List<UserDTO>> {
             override fun onResponse(call: Call<List<UserDTO>>, response: Response<List<UserDTO>>) {
-                Log.d("CollectionsRepo", "getUsersInCollection -> ${response}")
+                Log.d("CollectionsRepo", "getUsersInCollection: ${response}")
                 if (response.isSuccessful) {
                     if (response.body()?.equals("No existen miembros en esta colección.") == true) {
                         val empty: List<UserDTO> = emptyList()
@@ -91,7 +91,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
             }
 
             override fun onFailure(call: Call<List<UserDTO>>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "getUsersInCollection: ${t.message}")
                 onResult(null)
             }
         })
@@ -101,6 +101,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
         val call = api.getNonUsersInCollection(collectionName)
         call.enqueue(object : Callback<List<UserDTO>> {
             override fun onResponse(call: Call<List<UserDTO>>, response: Response<List<UserDTO>>) {
+                Log.d("CollectionsRepo", "getNonUsersInCollection: ${response}")
                 if (response.isSuccessful) {
                     callback(response.body())
                 } else {
@@ -109,6 +110,7 @@ class CollectionsRepository(private val api: CollectionsApi) {
             }
 
             override fun onFailure(call: Call<List<UserDTO>>, t: Throwable) {
+                Log.e("CollectionsRepo", "getNonUsersInCollection: ${t.message}")
                 callback(null)
             }
         })
@@ -118,12 +120,12 @@ class CollectionsRepository(private val api: CollectionsApi) {
     fun getCollection(name: String, onResult: (CollectionDTO?) -> Unit) {
         api.getCollection(name).enqueue(object : Callback<CollectionDTO> {
             override fun onResponse(call: Call<CollectionDTO>, response: Response<CollectionDTO>) {
-                Log.d("CollectionsRepo", "getCollection -> ${response}")
+                Log.d("CollectionsRepo", "getCollection: ${response}")
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<CollectionDTO>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "getCollection: ${t.message}")
                 onResult(null)
             }
         })
@@ -132,12 +134,12 @@ class CollectionsRepository(private val api: CollectionsApi) {
     fun createCollection(json: JsonObject, onResult: (Boolean) -> Unit) {
         api.createCollection(json).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d("CollectionsRepo", "createCollection -> ${response}")
+                Log.d("CollectionsRepo", "createCollection: ${response}")
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "createCollection: ${t.message}")
                 onResult(false)
             }
         })
@@ -146,12 +148,12 @@ class CollectionsRepository(private val api: CollectionsApi) {
     fun updateCollection(json: JsonObject, onResult: (Boolean) -> Unit) {
         api.updateCollection(json).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d("CollectionsRepo", "updateCollection -> ${response}")
+                Log.d("CollectionsRepo", "updateCollection: ${response}")
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "updateCollection: ${t.message}")
                 onResult(false)
             }
         })
@@ -160,12 +162,12 @@ class CollectionsRepository(private val api: CollectionsApi) {
     fun deleteCollection(name: String, onResult: (Boolean) -> Unit) {
         api.deleteCollection(name).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.d("CollectionsRepo", "deleteCollection -> ${response}")
+                Log.d("CollectionsRepo", "deleteCollection: ${response}")
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("CollectionsRepo", "Error: ${t.message}")
+                Log.e("CollectionsRepo", "deleteCollection: ${t.message}")
                 onResult(false)
             }
         })
@@ -173,17 +175,20 @@ class CollectionsRepository(private val api: CollectionsApi) {
 
     fun getAllCollections(callback: (List<CollectionDTO>?) -> Unit) {
         api.getAllCollections().enqueue(object : Callback<List<CollectionDTO>> {
-            override fun onResponse(call: Call<List<CollectionDTO>>, response: Response<List<CollectionDTO>>) {
+            override fun onResponse(
+                call: Call<List<CollectionDTO>>,
+                response: Response<List<CollectionDTO>>
+            ) {
                 if (response.isSuccessful) {
                     callback(response.body())
                 } else {
-                    Log.e("API", "Error getAllCollections: ${response.code()}")
+                    Log.e("CollectionsRepo", "getAllCollections: ${response.code()}")
                     callback(null)
                 }
             }
 
             override fun onFailure(call: Call<List<CollectionDTO>>, t: Throwable) {
-                Log.e("API", "Error getAllCollections: ${t.message}")
+                Log.e("CollectionsRepo", "getAllCollections: ${t.message}")
                 callback(null)
             }
         })

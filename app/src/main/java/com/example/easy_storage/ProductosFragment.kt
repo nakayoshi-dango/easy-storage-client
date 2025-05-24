@@ -16,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.example.easy_storage.api.RetrofitInstance
 import com.example.easy_storage.api.products.ProductsRepository
+import com.example.easy_storage.api.users.UsersRepository
 import com.example.easy_storage.models.ProductDTO
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.JsonObject
@@ -27,6 +28,7 @@ class ProductosFragment : Fragment() {
     private lateinit var adapter: ProductosAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
+    private val usersRepository = UsersRepository(RetrofitInstance.usersApi)
     private val productsRepository = ProductsRepository(RetrofitInstance.productsApi)
 
     override fun onCreateView(
@@ -39,8 +41,6 @@ class ProductosFragment : Fragment() {
         swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = ProductosAdapter(emptyList())
-        recyclerView.adapter = adapter
 
         parentFragmentManager.setFragmentResultListener("scannerResult", this) { _, bundle ->
             val scannedId = bundle.getString("scannedProductId")
@@ -80,27 +80,29 @@ class ProductosFragment : Fragment() {
                 if (!isAdded || view == null) return@runOnUiThread
 
                 swipeRefreshLayout.isRefreshing = false
-
-                if (productos != null) {
-                    adapter = ProductosAdapter(
-                        productos,
-                        onOptionSelected = { producto, opcion ->
-                            when (opcion) {
-                                "editar" -> mostrarDialogoEditar(producto)
-                                "eliminar" -> eliminarProducto(producto)
+                usersRepository.getCurrentUser { user ->
+                    if (productos != null) {
+                        adapter = ProductosAdapter(
+                            productos,
+                            user!!,
+                            onOptionSelected = { producto, opcion ->
+                                when (opcion) {
+                                    "editar" -> mostrarDialogoEditar(producto)
+                                    "eliminar" -> eliminarProducto(producto)
+                                }
+                            },
+                            onItemClick = { producto ->
+                                mostrarDialogoDetalles(producto)
                             }
-                        },
-                        onItemClick = { producto ->
-                            mostrarDialogoDetalles(producto)
-                        }
-                    )
-                    recyclerView.adapter = adapter
-                } else {
-                    Toast.makeText(
-                        requireContext(),
-                        "Error al cargar productos",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                        )
+                        recyclerView.adapter = adapter
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "Error al cargar productos",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             }
         }
@@ -131,7 +133,6 @@ class ProductosFragment : Fragment() {
 
         dialog.show()
     }
-
 
     private fun mostrarDialogoEditar(producto: ProductDTO) {
         val dialogView =

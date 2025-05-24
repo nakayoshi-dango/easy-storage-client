@@ -24,7 +24,6 @@ class UsuarioFragment(productsCount: Int) : Fragment() {
     private val binding get() = _binding!!
     private val productsRepository = ProductsRepository(RetrofitInstance.productsApi)
     private val usersRepository = UsersRepository(RetrofitInstance.usersApi)
-    private var productsCount: Int = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,6 +60,26 @@ class UsuarioFragment(productsCount: Int) : Fragment() {
             }
         }
 
+        btnChangeImg.setOnClickListener {
+            val nuevaUrl = etImagenURL.text.toString()
+
+            if (!isValidUrl(nuevaUrl)) {
+                Toast.makeText(requireContext(), "URL no válida", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            usersRepository.setProfilePicture(nuevaUrl) { exito ->
+                requireActivity().runOnUiThread {
+                    if (exito) {
+                        Toast.makeText(requireContext(), "Imagen actualizada", Toast.LENGTH_SHORT).show()
+                        recargarFragmento()
+                    } else {
+                        Toast.makeText(requireContext(), "Error al actualizar la imagen", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
 
         btnAyuda.setOnClickListener {
             Toast.makeText(
@@ -90,6 +109,7 @@ class UsuarioFragment(productsCount: Int) : Fragment() {
         }
         txtProductos.text = "Productos creados: $count"
         txtFecha.text = "Fecha de creación: ${formatearFecha(user.creationDate)}"
+        etImagenURL.setText(user.imageURL.toString())
 
         if (isValidUrl(user.imageURL)) {
             Glide.with(this@UsuarioFragment).load(user.imageURL).into(imgPerfil)
@@ -134,4 +154,13 @@ class UsuarioFragment(productsCount: Int) : Fragment() {
         _binding = null
         super.onDestroyView()
     }
+
+    private fun recargarFragmento() {
+        val fragmentManager = parentFragmentManager
+        fragmentManager.beginTransaction()
+            .detach(this)
+            .attach(this)
+            .commit()
+    }
+
 }

@@ -11,12 +11,12 @@ class UsersRepository(private val usersApi: UsersApi) {
     fun getAllUsers(onResult: (List<UserDTO>?) -> Unit) {
         usersApi.getAllUsers().enqueue(object : Callback<List<UserDTO>> {
             override fun onResponse(call: Call<List<UserDTO>>, response: Response<List<UserDTO>>) {
-                Log.e("UsersRepo","Respuesta: $response")
+                Log.e("UsersRepo","getAllUsers: $response")
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<List<UserDTO>>, t: Throwable) {
-                Log.e("UsersRepo", "Error al obtener todos los usuarios: ${t.message}")
+                Log.e("UsersRepo", "getAllUsers: ${t.message}")
                 onResult(null)
             }
         })
@@ -43,12 +43,12 @@ class UsersRepository(private val usersApi: UsersApi) {
     fun getUser(username: String, onResult: (UserDTO?) -> Unit) {
         usersApi.getUser(username).enqueue(object : Callback<UserDTO> {
             override fun onResponse(call: Call<UserDTO>, response: Response<UserDTO>) {
-                Log.e("UsersRepo","Respuesta: $response")
+                Log.e("UsersRepo","getUser: $response")
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<UserDTO>, t: Throwable) {
-                Log.e("UsersRepo", "Error al obtener el usuario: ${t.message}")
+                Log.e("UsersRepo", "getUser: ${t.message}")
                 onResult(null)
             }
         })
@@ -57,12 +57,12 @@ class UsersRepository(private val usersApi: UsersApi) {
     fun setProfilePicture(imgURL: String, onResult: (Boolean) -> Unit) {
         usersApi.setProfilePicture(imgURL).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("UsersRepo","Respuesta: $response")
+                Log.e("UsersRepo","setProfilePicture: $response")
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("UsersRepo", "Error al cambiar la foto de perfil: ${t.message}")
+                Log.e("UsersRepo", "setProfilePicture: ${t.message}")
                 onResult(false)
             }
         })
@@ -71,12 +71,12 @@ class UsersRepository(private val usersApi: UsersApi) {
     fun addToCollection(collectionName: String, usernameToAdd: String, onResult: (Boolean) -> Unit) {
         usersApi.addToCollection(collectionName, usernameToAdd).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("UsersRepo","Respuesta: $response")
+                Log.e("UsersRepo","addToCollection: $response")
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("UsersRepo", "Error al añadir usuario a la colección: ${t.message}")
+                Log.e("UsersRepo", "addToCollection: ${t.message}")
                 onResult(false)
             }
         })
@@ -85,12 +85,12 @@ class UsersRepository(private val usersApi: UsersApi) {
     fun deleteFromCollection(collectionName: String, usernameToDelete: String, onResult: (Boolean) -> Unit) {
         usersApi.deleteFromCollection(collectionName, usernameToDelete).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("UsersRepo","Respuesta: $response")
+                Log.e("UsersRepo","deleteFromCollection: $response")
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("UsersRepo", "Error al eliminar usuario de la colección: ${t.message}")
+                Log.e("UsersRepo", "deleteFromCollection: ${t.message}")
                 onResult(false)
             }
         })

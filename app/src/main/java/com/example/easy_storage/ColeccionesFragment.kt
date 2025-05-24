@@ -76,7 +76,9 @@ class ColeccionesFragment : Fragment() {
 
                     swipeRefreshLayout.isRefreshing = false
 
-                    if (colecciones != null) {
+                    if (colecciones != null && user != null) {
+                        val currentUsername = user.username
+                        val isAdmin = user.role == "ROLE_ADMIN"
                         adapter = ColeccionesAdapter(
                             colecciones,
                             onOptionSelected = { coleccion, opcion ->
@@ -168,7 +170,9 @@ class ColeccionesFragment : Fragment() {
                                         intentarMostrarDialogo()
                                     }
                                 }
-                            }
+                            },
+                            currentUsername = currentUsername,
+                            isAdmin = isAdmin
                         )
                         recyclerView.adapter = adapter
                     } else {
@@ -205,7 +209,7 @@ class ColeccionesFragment : Fragment() {
         tvId.text = "ID: ${coleccion.id}"
         tvNombre.text = "Nombre: ${coleccion.name}"
         tvDescripcion.text = "Descripción: ${coleccion.description}"
-        usersRepository.getCurrentUser { user ->
+        usersRepository.getUser(coleccion.ownerUsername) { user ->
             requireActivity().runOnUiThread {
                 if (isValidUrl(user?.imageURL)) {
                     Glide.with(this@ColeccionesFragment).load(user?.imageURL)
@@ -240,8 +244,13 @@ class ColeccionesFragment : Fragment() {
         val btnAddMiembro = dialogView.findViewById<ImageButton>(R.id.btnAddMiembro)
         val btnAddProducto = dialogView.findViewById<ImageButton>(R.id.btnAddProducto)
 
-        btnAddMiembro.isEnabled = puedeModificarMiembros
-        btnAddMiembro.isVisible = puedeModificarMiembros
+        if (puedeModificarMiembros) {
+            btnAddMiembro.visibility = View.VISIBLE
+            btnAddMiembro.isEnabled = true
+        } else {
+            btnAddMiembro.visibility = View.GONE
+            btnAddMiembro.isEnabled = false
+        }
         btnAddMiembro.setOnClickListener {
             usersRepository.getCurrentUser { user ->
                 if (user?.username == (coleccion.ownerUsername) || user?.role == "ROLE_ADMIN") {
@@ -465,15 +474,18 @@ class ColeccionesFragment : Fragment() {
 
         val inputNombre = dialogView.findViewById<EditText>(R.id.inputNombreColeccion)
         val inputDescripcion = dialogView.findViewById<EditText>(R.id.inputDescripcionColeccion)
+        val inputImagenURL = dialogView.findViewById<EditText>(R.id.inputImagenColeccion)
 
         dialogView.findViewById<Button>(R.id.btnGuardarColeccion).setOnClickListener {
             val nombre = inputNombre.text.toString()
             val descripcion = inputDescripcion.text.toString()
+            val imagenURL = inputImagenURL.text.toString()
 
             if (nombre.isNotBlank() && nombre.length < 255) {
                 val nueva = JsonObject().apply {
                     addProperty("name", nombre)
                     addProperty("description", descripcion)
+                    addProperty("imageURL", imagenURL)
                 }
 
                 collectionsRepository.createCollection(nueva) { success ->
@@ -514,6 +526,7 @@ class ColeccionesFragment : Fragment() {
 
         val inputNombre = dialogView.findViewById<EditText>(R.id.inputNombreColeccion)
         val inputDescripcion = dialogView.findViewById<EditText>(R.id.inputDescripcionColeccion)
+        val inputImagenURL = dialog.findViewById<EditText>(R.id.inputImagenColeccion)
 
         inputNombre.setText(coleccion.name)
         inputDescripcion.setText(coleccion.description)
@@ -521,12 +534,14 @@ class ColeccionesFragment : Fragment() {
         dialogView.findViewById<Button>(R.id.btnGuardarColeccion).setOnClickListener {
             val nombre = inputNombre.text.toString()
             val descripcion = inputDescripcion.text.toString()
+            val imageURL = inputImagenURL.text.toString()
 
             if (nombre.isNotBlank() && nombre.length < 255) {
                 val json = JsonObject().apply {
                     addProperty("id", coleccion.id)
                     addProperty("name", nombre)
                     addProperty("description", descripcion)
+                    addProperty("imageURL", imageURL)
                 }
 
                 collectionsRepository.updateCollection(json) { success ->

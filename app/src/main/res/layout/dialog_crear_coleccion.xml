@@ -12,6 +12,12 @@
         android:hint="Nombre de la colección" />
 
     <EditText
+        android:id="@+id/inputImagenColeccion"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:hint="URL Imagen" />
+
+    <EditText
         android:id="@+id/inputDescripcionColeccion"
         android:layout_width="match_parent"
         android:layout_height="150dp"

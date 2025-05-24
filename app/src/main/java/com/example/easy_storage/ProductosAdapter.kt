@@ -14,9 +14,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.easy_storage.models.ProductDTO
 import android.util.Log
+import com.example.easy_storage.models.UserDTO
 
 class ProductosAdapter(
     private var productDTOS: List<ProductDTO>,
+    private val currentUser: UserDTO,
     private val onOptionSelected: (productDTO: ProductDTO, option: String) -> Unit = { _, _ -> },
     private val onItemClick: (productDTO: ProductDTO) -> Unit = {}
 ) : RecyclerView.Adapter<ProductosAdapter.ProductoViewHolder>() {
@@ -37,14 +39,25 @@ class ProductosAdapter(
 
     override fun onBindViewHolder(holder: ProductoViewHolder, position: Int) {
         val producto = productDTOS[position]
-        Log.e("ProductosAdapter", "Producto en la posición $position: $producto")
-        holder.txtNombre.text = producto.name?: "Nombre desconocido"
+
+        holder.txtNombre.text = producto.name ?: "Nombre desconocido"
         holder.txtId.text = "ID: ${producto.id}"
 
         if (!producto.imageURL.isNullOrBlank() && isValidUrl(producto.imageURL)) {
             Glide.with(holder.itemView.context).load(producto.imageURL).into(holder.imgProducto)
         } else {
             holder.imgProducto.setImageResource(R.drawable.ic_launcher_foreground)
+        }
+
+        // Ocultar el botón si no es admin ni propietario
+        val esAdmin = currentUser.role.equals("ADMIN", ignoreCase = true)
+        val esPropietario = producto.uploaderUsername == currentUser.username
+        if (esAdmin || esPropietario) {
+            holder.menuButton.visibility = View.VISIBLE
+            holder.menuButton.isEnabled = true
+        } else {
+            holder.menuButton.visibility = View.GONE
+            holder.menuButton.isEnabled = false
         }
 
         holder.itemView.setOnClickListener {

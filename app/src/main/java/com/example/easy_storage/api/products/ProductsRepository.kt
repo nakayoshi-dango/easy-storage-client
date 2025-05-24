@@ -12,12 +12,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun getAllProducts(onResult: (List<ProductDTO>?) -> Unit) {
         productsApi.getAllProducts().enqueue(object : Callback<List<ProductDTO>> {
             override fun onResponse(call: Call<List<ProductDTO>>, response: Response<List<ProductDTO>>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","getAllProducts: ${response}" )
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<List<ProductDTO>>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al obtener todos los productos: ${t.message}")
+                Log.e("ProductsRepo", "getAllProducts: ${t.message}")
                 onResult(null)
             }
         })
@@ -26,12 +26,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun getMyProducts(onResult: (List<ProductDTO>?) -> Unit) {
         productsApi.getMyProducts().enqueue(object : Callback<List<ProductDTO>> {
             override fun onResponse(call: Call<List<ProductDTO>>, response: Response<List<ProductDTO>>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","getMyProducts: ${response}" )
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<List<ProductDTO>>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al obtener tus productos: ${t.message}")
+                Log.e("ProductsRepo", "getMyProducts: ${t.message}")
                 onResult(null)
             }
         })
@@ -40,12 +40,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun getMyProductsCount(onResult: (Int?) -> Unit) {
         productsApi.getMyProductsCount().enqueue(object : Callback<Int> {
             override fun onResponse(call: Call<Int>, response: Response<Int>) {
-                Log.e("ProductsRepo", "Respuesta: ${response}")
+                Log.e("ProductsRepo", "getMyProductsCount: ${response}")
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<Int>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al obtener el número de productos: ${t.message}")
+                Log.e("ProductsRepo", "getMyProductsCount: ${t.message}")
                 onResult(null)
             }
         })
@@ -54,12 +54,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun getProduct(productId: String, onResult: (ProductDTO?) -> Unit) {
         productsApi.getProduct(productId).enqueue(object : Callback<ProductDTO> {
             override fun onResponse(call: Call<ProductDTO>, response: Response<ProductDTO>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","getProduct: ${response}" )
                 onResult(response.body())
             }
 
             override fun onFailure(call: Call<ProductDTO>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al obtener el producto: ${t.message}")
+                Log.e("ProductsRepo", "getProduct: ${t.message}")
                 onResult(null)
             }
         })
@@ -68,12 +68,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun createProduct(json: JsonObject, onResult: (Boolean) -> Unit) {
         productsApi.createProduct(json).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","createProduct: ${response}" )
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al crear el producto: ${t.message}")
+                Log.e("ProductsRepo", "createProduct: ${t.message}")
                 onResult(false)
             }
         })
@@ -82,12 +82,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun updateProduct(json: JsonObject, onResult: (Boolean) -> Unit) {
         productsApi.updateProduct(json).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","updateProduct: ${response}" )
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al editar el producto: ${t.message}")
+                Log.e("ProductsRepo", "updateProduct: ${t.message}")
                 onResult(false)
             }
         })
@@ -96,12 +96,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun deleteProduct(productId: String, onResult: (Boolean) -> Unit) {
         productsApi.deleteProduct(productId).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","deleteProduct: ${response}" )
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al eliminar el producto: ${t.message}")
+                Log.e("ProductsRepo", "deleteProduct: ${t.message}")
                 onResult(false)
             }
         })
@@ -110,12 +110,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun addToCollection(productId: String, collectionName: String, quantity: Int, onResult: (Boolean) -> Unit) {
         productsApi.addToCollection(productId, collectionName, quantity).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","addToCollection: ${response}" )
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al añadir el producto a la colección: ${t.message}")
+                Log.e("ProductsRepo", "addToCollection: ${t.message}")
                 onResult(false)
             }
         })
@@ -124,12 +124,12 @@ class ProductsRepository(private val productsApi: ProductsApi) {
     fun deleteFromCollection(productId: String, collectionName: String, onResult: (Boolean) -> Unit) {
         productsApi.deleteFromCollection(productId, collectionName).enqueue(object : Callback<String> {
             override fun onResponse(call: Call<String>, response: Response<String>) {
-                Log.e("ProductsRepo","Respuesta: ${response}" )
+                Log.e("ProductsRepo","deleteFromCollection: ${response}" )
                 onResult(response.isSuccessful)
             }
 
             override fun onFailure(call: Call<String>, t: Throwable) {
-                Log.e("ProductsRepo", "Error al retirar el producto de la colección: ${t.message}")
+                Log.e("ProductsRepo", "deleteFromCollection: ${t.message}")
                 onResult(false)
             }
         })

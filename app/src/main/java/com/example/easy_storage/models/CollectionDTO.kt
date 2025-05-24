@@ -8,4 +8,5 @@ data class CollectionDTO(
     val description: String,
     val ownerUsername: String,
     val creationDate: Date,
+    val imageURL: String
 )
