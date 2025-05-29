@@ -137,6 +137,7 @@ class ProductosFragment : Fragment() {
 
         dialogView.findViewById<TextView>(R.id.tvId).text = "ID: ${producto.id}"
         dialogView.findViewById<TextView>(R.id.tvNombre).text = "Nombre: ${producto.name}"
+        dialogView.findViewById<TextView>(R.id.tvPropietario).text = "Propietario: ${producto.uploaderUsername}"
         dialogView.findViewById<TextView>(R.id.tvDescripcion).text =
             "Descripción: ${producto.description}"
         dialogView.findViewById<TextView>(R.id.tvDondeComprar).text =

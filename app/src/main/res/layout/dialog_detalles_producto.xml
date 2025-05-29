@@ -17,6 +17,11 @@
         android:layout_height="wrap_content" />
 
     <TextView
+        android:id="@+id/tvPropietario"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
         android:id="@+id/tvDescripcion"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
