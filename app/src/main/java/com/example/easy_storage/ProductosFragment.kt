@@ -154,34 +154,52 @@ class ProductosFragment : Fragment() {
         inputURLImagen.setText(producto.imageURL)
 
         dialogView.findViewById<Button>(R.id.btnGuardar).setOnClickListener {
-            if (inputNombre.text.toString().length < 255 && inputDondeComprar.text.toString().length < 255) {
-                val jsonEditado = JsonObject().apply {
-                    addProperty("id", producto.id)
-                    addProperty("name", inputNombre.text.toString())
-                    addProperty("description", inputDescripcion.text.toString())
-                    addProperty("whereToBuy", inputDondeComprar.text.toString())
-                    if (inputURLImagen.text.toString().isNotEmpty()) {
-                        addProperty("imageURL", inputURLImagen.text.toString())
-                    }
-                }
-
-                productsRepository.updateProduct(jsonEditado) { success ->
-                    requireActivity().runOnUiThread {
-                        if (success) {
-                            Toast.makeText(requireContext(), "Producto editado", Toast.LENGTH_SHORT)
-                                .show()
-                            loadProductos()
-                            dialog.dismiss()
-                        } else {
-                            Toast.makeText(requireContext(), "Error al editar", Toast.LENGTH_SHORT)
-                                .show()
+            if (inputNombre.text.toString().isNotBlank() && inputDescripcion.text.toString()
+                    .isNotBlank() && inputDondeComprar.text.toString().isNotBlank()
+            ) {
+                if (inputNombre.text.toString().length < 255 && inputDondeComprar.text.toString().length < 255) {
+                    val jsonEditado = JsonObject().apply {
+                        addProperty("id", producto.id)
+                        addProperty("name", inputNombre.text.toString())
+                        addProperty("description", inputDescripcion.text.toString())
+                        addProperty("whereToBuy", inputDondeComprar.text.toString())
+                        if (inputURLImagen.text.toString().isNotEmpty()) {
+                            addProperty("imageURL", inputURLImagen.text.toString())
                         }
                     }
+
+                    productsRepository.updateProduct(jsonEditado) { success ->
+                        requireActivity().runOnUiThread {
+                            if (success) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Producto editado",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                                loadProductos()
+                                dialog.dismiss()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error al editar",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                            }
+                        }
+                    }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error. Dónde comprar o nombre demasiado largo.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 Toast.makeText(
                     requireContext(),
-                    "Error. Dónde comprar o nombre demasiado largo.",
+                    "Error. Has dejado vacíos los campos obligatorios.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -204,37 +222,51 @@ class ProductosFragment : Fragment() {
         val inputURLImagen = dialogView.findViewById<EditText>(R.id.inputURLImagen)
 
         dialogView.findViewById<Button>(R.id.btnGuardar).setOnClickListener {
-            if (inputNombre.text.toString().length < 255 && inputDondeComprar.text.toString().length < 255) {
-                val nuevoProducto = JsonObject().apply {
-                    addProperty("id", productId)
-                    addProperty("name", inputNombre.text.toString())
-                    addProperty("description", inputDescripcion.text.toString())
-                    addProperty("whereToBuy", inputDondeComprar.text.toString())
-                    if (inputURLImagen.text.toString().isNotEmpty()) {
-                        addProperty("imageURL", inputURLImagen.text.toString())
-                    }
-                }
-
-                productsRepository.createProduct(nuevoProducto) { success ->
-                    requireActivity().runOnUiThread {
-                        if (success) {
-                            Toast.makeText(requireContext(), "Producto creado", Toast.LENGTH_SHORT)
-                                .show()
-                            loadProductos()
-                            dialog.dismiss()
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Error. Ya existe un producto con esta ID o nombre.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+            if (inputNombre.text.toString().isNotEmpty() && inputDescripcion.text.toString()
+                    .isNotEmpty() && inputDondeComprar.text.toString().isNotEmpty()
+            ) {
+                if (inputNombre.text.toString().length < 255 && inputDondeComprar.text.toString().length < 255) {
+                    val nuevoProducto = JsonObject().apply {
+                        addProperty("id", productId)
+                        addProperty("name", inputNombre.text.toString())
+                        addProperty("description", inputDescripcion.text.toString())
+                        addProperty("whereToBuy", inputDondeComprar.text.toString())
+                        if (inputURLImagen.text.toString().isNotEmpty()) {
+                            addProperty("imageURL", inputURLImagen.text.toString())
                         }
                     }
+
+                    productsRepository.createProduct(nuevoProducto) { success ->
+                        requireActivity().runOnUiThread {
+                            if (success) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Producto creado",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                                loadProductos()
+                                dialog.dismiss()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error. Ya existe un producto con esta ID o nombre.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+                    }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error. Dónde comprar o nombre demasiado largo.",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 Toast.makeText(
                     requireContext(),
-                    "Error. Dónde comprar o nombre demasiado largo.",
+                    "Error. Has dejado vacíos los campos obligatorios.",
                     Toast.LENGTH_SHORT
                 ).show()
             }

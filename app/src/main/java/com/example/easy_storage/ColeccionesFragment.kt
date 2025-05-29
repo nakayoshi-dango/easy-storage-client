@@ -480,34 +480,47 @@ class ColeccionesFragment : Fragment() {
             val nombre = inputNombre.text.toString()
             val descripcion = inputDescripcion.text.toString()
             val imagenURL = inputImagenURL.text.toString()
+            if (inputNombre.text.toString().isNotBlank() && inputDescripcion.text.toString()
+                    .isNotBlank()
+            ) {
+                if (nombre.length < 255) {
+                    val nueva = JsonObject().apply {
+                        addProperty("name", nombre)
+                        addProperty("description", descripcion)
+                        addProperty("imageURL", imagenURL)
+                    }
 
-            if (nombre.isNotBlank() && nombre.length < 255) {
-                val nueva = JsonObject().apply {
-                    addProperty("name", nombre)
-                    addProperty("description", descripcion)
-                    addProperty("imageURL", imagenURL)
-                }
-
-                collectionsRepository.createCollection(nueva) { success ->
-                    requireActivity().runOnUiThread {
-                        if (success) {
-                            Toast.makeText(requireContext(), "Colección creada", Toast.LENGTH_SHORT)
-                                .show()
-                            loadColecciones()
-                            dialog.dismiss()
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Error. Ya existe una colección con ese nombre.",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                    collectionsRepository.createCollection(nueva) { success ->
+                        requireActivity().runOnUiThread {
+                            if (success) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Colección creada",
+                                    Toast.LENGTH_SHORT
+                                )
+                                    .show()
+                                loadColecciones()
+                                dialog.dismiss()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error. Ya existe una colección con ese nombre.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Nombre demasiado largo",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 Toast.makeText(
                     requireContext(),
-                    "Nombre inválido o demasiado largo",
+                    "Error. Has dejado vacíos los campos obligatorios.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
@@ -535,38 +548,47 @@ class ColeccionesFragment : Fragment() {
             val nombre = inputNombre.text.toString()
             val descripcion = inputDescripcion.text.toString()
             val imageURL = inputImagenURL.text.toString()
+            if (inputNombre.text.toString().isNotBlank() && inputDescripcion.text.toString()
+                    .isNotBlank()
+            ) {
+                if (nombre.length < 255) {
+                    val json = JsonObject().apply {
+                        addProperty("id", coleccion.id)
+                        addProperty("name", nombre)
+                        addProperty("description", descripcion)
+                        addProperty("imageURL", imageURL)
+                    }
 
-            if (nombre.isNotBlank() && nombre.length < 255) {
-                val json = JsonObject().apply {
-                    addProperty("id", coleccion.id)
-                    addProperty("name", nombre)
-                    addProperty("description", descripcion)
-                    addProperty("imageURL", imageURL)
-                }
-
-                collectionsRepository.updateCollection(json) { success ->
-                    requireActivity().runOnUiThread {
-                        if (success) {
-                            Toast.makeText(
-                                requireContext(),
-                                "Colección actualizada",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            loadColecciones()
-                            dialog.dismiss()
-                        } else {
-                            Toast.makeText(
-                                requireContext(),
-                                "Error al actualizar",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                    collectionsRepository.updateCollection(json) { success ->
+                        requireActivity().runOnUiThread {
+                            if (success) {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Colección actualizada",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                loadColecciones()
+                                dialog.dismiss()
+                            } else {
+                                Toast.makeText(
+                                    requireContext(),
+                                    "Error al actualizar",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Nombre inválido o demasiado largo",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             } else {
                 Toast.makeText(
                     requireContext(),
-                    "Nombre inválido o demasiado largo",
+                    "Error. Has dejado vacíos los campos obligatorios.",
                     Toast.LENGTH_SHORT
                 ).show()
             }
