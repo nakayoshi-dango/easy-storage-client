@@ -19,7 +19,7 @@ class LoginRegisterFragment : Fragment() {
     private lateinit var etPassword: EditText
     private lateinit var btnSubmit: Button
     private lateinit var btnToggleMode: Button
-
+    var isExpanded = false
     private var isLoginMode = true
     private lateinit var authRepository: AuthRepository
 
@@ -42,13 +42,23 @@ class LoginRegisterFragment : Fragment() {
 
         updateUI()
 
-        val sharedPref = requireActivity().getSharedPreferences("config", android.content.Context.MODE_PRIVATE)
+        val sharedPref =
+            requireActivity().getSharedPreferences("config", android.content.Context.MODE_PRIVATE)
         val savedIp = sharedPref.getString("ip", "")
         val savedPort = sharedPref.getString("port", "")
 
         etIp.setText(savedIp)
         etPort.setText(savedPort)
 
+        val header = view.findViewById<LinearLayout>(R.id.header)
+        val contenido = view.findViewById<LinearLayout>(R.id.contenidoOculto)
+        val arrow = view.findViewById<ImageView>(R.id.arrow)
+
+        header.setOnClickListener {
+            isExpanded = !isExpanded
+            contenido.visibility = if (isExpanded) View.VISIBLE else View.GONE
+            arrow.setImageResource(if (isExpanded) R.drawable.ic_drop_up else R.drawable.ic_drop_down)
+        }
 
         btnToggleMode.setOnClickListener {
             isLoginMode = !isLoginMode

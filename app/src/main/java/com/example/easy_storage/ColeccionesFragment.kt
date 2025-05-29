@@ -14,9 +14,7 @@ import com.example.easy_storage.models.CollectionDTO
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.JsonObject
 import androidx.appcompat.app.AlertDialog
-import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
-import com.example.easy_storage.UsuarioFragment
 import com.example.easy_storage.api.products.ProductsRepository
 import com.example.easy_storage.api.users.UsersRepository
 import com.example.easy_storage.models.ProductCollectionDTO
@@ -407,7 +405,7 @@ class ColeccionesFragment : Fragment() {
                         }
 
                         var pendientes = cambios.size
-                        var algunoFalló = false
+                        var algunoFalla = false
 
                         for ((productId, cantidad) in cambios) {
                             productsRepository.addToCollection(
@@ -416,12 +414,12 @@ class ColeccionesFragment : Fragment() {
                                 cantidad
                             ) { success ->
                                 requireActivity().runOnUiThread {
-                                    if (!success) algunoFalló = true
+                                    if (!success) algunoFalla = true
                                     pendientes--
 
                                     if (pendientes == 0) {
                                         dialog.dismiss()
-                                        if (algunoFalló) {
+                                        if (algunoFalla) {
                                             Toast.makeText(
                                                 requireContext(),
                                                 "Hubo errores al añadir productos",

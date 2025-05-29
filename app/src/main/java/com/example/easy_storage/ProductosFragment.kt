@@ -1,6 +1,8 @@
 package com.example.easy_storage
 
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +22,8 @@ import com.example.easy_storage.api.users.UsersRepository
 import com.example.easy_storage.models.ProductDTO
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.JsonObject
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.common.InputImage
 
 class ProductosFragment : Fragment() {
 
@@ -64,6 +68,20 @@ class ProductosFragment : Fragment() {
 
         // Cargar productos al iniciar
         loadProductos()
+
+        val scanner = BarcodeScanning.getClient()
+
+        // Imagen vacía de 1x1 px (nunca va a detectar nada, pero forzará descarga)
+        val dummyBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        val dummyImage = InputImage.fromBitmap(dummyBitmap, 0)
+
+        scanner.process(dummyImage)
+            .addOnSuccessListener {
+                Log.d("MLKit", "El módulo de escaneo ya está disponible.")
+            }
+            .addOnFailureListener { e ->
+                Log.w("MLKit", "Aún no disponible o falló: ${e.message}")
+            }
 
         return view
     }
