@@ -50,7 +50,7 @@ class ProductosAdapter(
         }
 
         // Ocultar el botón si no es admin ni propietario
-        val esAdmin = currentUser.role.equals("ADMIN", ignoreCase = true)
+        val esAdmin = currentUser.role.equals("ROLE_ADMIN", ignoreCase = true)
         val esPropietario = producto.uploaderUsername == currentUser.username
         if (esAdmin || esPropietario) {
             holder.menuButton.visibility = View.VISIBLE
