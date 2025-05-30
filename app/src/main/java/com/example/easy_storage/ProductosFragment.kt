@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.example.easy_storage.api.RetrofitInstance
 import com.example.easy_storage.api.products.ProductsRepository
 import com.example.easy_storage.api.users.UsersRepository
+import com.example.easy_storage.models.CollectionDTO
 import com.example.easy_storage.models.ProductDTO
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.JsonObject
@@ -99,10 +100,17 @@ class ProductosFragment : Fragment() {
 
                 swipeRefreshLayout.isRefreshing = false
                 usersRepository.getCurrentUser { user ->
+
+                    var productosLista: List<ProductDTO> = emptyList()
+
                     if (productos != null) {
+                        productosLista = productos.toList()
+                    }
+
+                    if (user != null) {
                         adapter = ProductosAdapter(
-                            productos,
-                            user!!,
+                            productosLista,
+                            user,
                             onOptionSelected = { producto, opcion ->
                                 when (opcion) {
                                     "editar" -> mostrarDialogoEditar(producto)
@@ -114,12 +122,6 @@ class ProductosFragment : Fragment() {
                             }
                         )
                         recyclerView.adapter = adapter
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Error al cargar productos",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }
             }

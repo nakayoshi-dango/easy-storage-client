@@ -74,11 +74,17 @@ class ColeccionesFragment : Fragment() {
 
                     swipeRefreshLayout.isRefreshing = false
 
-                    if (colecciones != null && user != null) {
+                    var coleccionesVisibles: List<CollectionDTO> = emptyList()
+
+                    if (colecciones != null) {
+                        coleccionesVisibles = colecciones.toList()
+                    }
+
+                    if (user != null) {
                         val currentUsername = user.username
                         val isAdmin = user.role == "ROLE_ADMIN"
                         adapter = ColeccionesAdapter(
-                            colecciones,
+                            coleccionesVisibles,
                             onOptionSelected = { coleccion, opcion ->
                                 when (opcion) {
                                     "editar" -> mostrarDialogoEditar(coleccion)
@@ -173,12 +179,6 @@ class ColeccionesFragment : Fragment() {
                             isAdmin = isAdmin
                         )
                         recyclerView.adapter = adapter
-                    } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Error al cargar colecciones",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
                 }
             }
